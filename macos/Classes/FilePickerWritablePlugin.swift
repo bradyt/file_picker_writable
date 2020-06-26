@@ -2,11 +2,11 @@ import Cocoa
 import FlutterMacOS
 
 public class FilePickerWritablePlugin: NSObject, FlutterPlugin {
-    
+
     public static func register(with registrar: FlutterPluginRegistrar) {
         _ = FilePickerWritablePlugin(with: registrar)
     }
-    
+
     private let channel: FlutterMethodChannel
     private let eventChannel: FlutterEventChannel
     private var _eventSink: FlutterEventSink? = nil
@@ -20,11 +20,11 @@ public class FilePickerWritablePlugin: NSObject, FlutterPlugin {
         eventChannel.setStreamHandler(self)
         NSAppleEventManager.shared().setEventHandler(self, andSelector: #selector(handleEvent(_:with:)), forEventClass: AEEventClass(kInternetEventClass), andEventID: AEEventID(kAEGetURL))
     }
-    
+
     deinit {
         NSAppleEventManager.shared().removeEventHandler(forEventClass: AEEventClass(kInternetEventClass), andEventID: AEEventID(kAEGetURL))
     }
-    
+
     @objc
     private func handleEvent(_ event: NSAppleEventDescriptor, with replyEvent: NSAppleEventDescriptor) {
         print("Got event. \(event)")
@@ -33,7 +33,7 @@ public class FilePickerWritablePlugin: NSObject, FlutterPlugin {
         print(url)
         channel.invokeMethod("handleUri", arguments: url.absoluteString)
     }
-    
+
     public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
         switch call.method {
         case "init":
@@ -55,12 +55,12 @@ extension FilePickerWritablePlugin: FlutterStreamHandler {
         }
         return nil
     }
-    
+
     public func onCancel(withArguments arguments: Any?) -> FlutterError? {
         _eventSink = nil
         return nil
     }
-    
+
     private func sendEvent(event: [String: String]) {
         if let _eventSink = _eventSink {
             _eventSink(event)
@@ -68,6 +68,5 @@ extension FilePickerWritablePlugin: FlutterStreamHandler {
             _eventQueue.append(event)
         }
     }
-    
-}
 
+}
